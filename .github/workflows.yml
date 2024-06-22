@@ -3,31 +3,38 @@ name: CI Workflow
 on:
   push:
     branches:
-      - main
+      - main  
   pull_request:
     branches:
-      - main
+      - main  
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     env:
-      NODE_VERSION: 16.x
+      API_KEY: ${{ secrets.TEST_1 }}  
+
+    strategy:
+      matrix:
+        node-version: [16.x] 
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: ${{ matrix.node-version }}
           cache: npm
           always-auth: false
           check-latest: false
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}  # GitHub token for authentication
 
       - name: Install dependencies
-        run: npm install
-      
-      - name: Run tests
-        run: npm test
+        run: npm install  # Use 'yarn install' if you prefer Yarn
+
+   
+      - name: Run tests with API key
+        run: npm test --apiKey=${{ env.TEST_1 }}
